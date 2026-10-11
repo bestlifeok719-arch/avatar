@@ -229,7 +229,7 @@ var cIn=document.createElement('input');cIn.type='file';cIn.accept='image/*';cIn
 cIn.onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){setImg(r.result)};r.readAsDataURL(f)};
 $('bCam').onclick=function(){cIn.click()};
 var aIn=document.createElement('input');aIn.type='file';aIn.accept='audio/*';aIn.setAttribute('capture','');aIn.hidden=true;document.body.appendChild(aIn);
-aIn.onchange=function(e){var f=e.target.files[0];if(!f)return;blobUrl=URL.createObjectURL(f);$('bPlay').disabled=false;msg('Sagaleen kee qophaa\'eera. Sagalee kootiin dubbisi tuqi.')};
+aIn.onchange=function(e){var f=e.target.files[0];if(!f)return;blobUrl=URL.createObjectURL(f);$('bPlay').disabled=false;msg('Sagaleen kee qophaa\'eera. Sagalee kootiin dubbisi tuqi.'+(window.recErr?' [Leyer xiqqaan hin hojjanne: '+window.recErr+'] [fuula: '+location.host+']':''))};
 $('bRec').onclick=function(){aIn.click()};
 $('bRec').textContent='Sagalee koo waraabi';
 var lvl=0,curScn='stad',SCOL={stad:['#9fd3ff','#4f9a50'],stage:['#8a5cff','#1b1033'],fant:['#f7b3d8','#2c2a6e'],home:['#f3e9d8','#d8c3a5']};
@@ -605,10 +605,10 @@ function startRec(){
   rch=[];mr2=new MediaRecorder(s);
   mr2.ondataavailable=function(e){if(e.data&&e.data.size)rch.push(e.data)};
   mr2.onstop=function(){clearInterval(rtm);s.getTracks().forEach(function(t){t.stop()});recUI(false);blobUrl=URL.createObjectURL(new Blob(rch,{type:mr2.mimeType}));mr2=null;$('bRec').textContent='Sagalee koo waraabi';$('bPlay').disabled=false;msg('Sagaleen kee qophaa\'eera. Sagalee kootiin dubbisi tuqi.')};
-  ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();var an2=ac.createAnalyser();an2.fftSize=256;ac.createMediaStreamSource(s).connect(an2);
+  var an2=null;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();an2=ac.createAnalyser();an2.fftSize=256;ac.createMediaStreamSource(s).connect(an2)}catch(z){an2=null}
   mr2.start();rst=performance.now();recUI(true);$('bRec').textContent='Dhaabi';
-  rtm=setInterval(function(){var d=new Uint8Array(an2.fftSize);an2.getByteTimeDomainData(d);var m=0;for(var i=0;i<d.length;i++)m+=Math.abs(d[i]-128);$('rl').style.width=Math.min(100,m/d.length*8)+'%';var sc=Math.floor((performance.now()-rst)/1000);$('rt').textContent=Math.floor(sc/60)+':'+('0'+sc%60).slice(-2)},100);
- }).catch(function(e){var inf=false;try{inf=window.self!==window.top}catch(z){inf=true}msg('Maayikiroofoonii hin banamne ('+(e&&e.name||'dogoggora')+'). '+(inf?'Fuulli kun Claude keessatti banameera, kanaaf waraabaan leyer xiqqaa hin hojjatu. Link ofii kee (github.io) Chrome irratti bani. Waraabaa bilbilaa ni banama.':'Chrome irratti 🔒 tuqi → Permissions → Microphone → Allow godhi. Waraabaa bilbilaa ni banama.'));aIn.click()})
+  rtm=setInterval(function(){var d=new Uint8Array(256).fill(128);if(an2){d=new Uint8Array(an2.fftSize);an2.getByteTimeDomainData(d)}var m=0;for(var i=0;i<d.length;i++)m+=Math.abs(d[i]-128);$('rl').style.width=Math.min(100,m/d.length*8)+'%';var sc=Math.floor((performance.now()-rst)/1000);$('rt').textContent=Math.floor(sc/60)+':'+('0'+sc%60).slice(-2)},100);
+ }).catch(function(e){var inf=false;try{inf=window.self!==window.top}catch(z){inf=true}window.recErr=(e&&(e.name+': '+(e.message||'')))||'err';msg('Maayikiroofoonii hin banamne ('+(e&&e.name||'dogoggora')+'). '+(inf?'Fuulli kun Claude keessatti banameera, kanaaf waraabaan leyer xiqqaa hin hojjatu. Link ofii kee (github.io) Chrome irratti bani. Waraabaa bilbilaa ni banama.':'Chrome irratti 🔒 tuqi → Permissions → Microphone → Allow godhi. Waraabaa bilbilaa ni banama.'));aIn.click()})
 }
 $('bRec').onclick=function(){if(mr2){mr2.stop();return}startRec()};
 var tt2=0;function msg(t){st.textContent=t;var d=$('toast');if(!d){d=document.createElement('div');d.id='toast';d.style.cssText='position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:60;background:rgba(20,24,31,.95);color:#fff;border-radius:12px;padding:10px 14px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.3);display:none';document.body.appendChild(d)}if(!t){d.style.display='none';return}d.textContent=t;d.style.display='block';clearTimeout(tt2);tt2=setTimeout(function(){d.style.display='none'},7000)}
