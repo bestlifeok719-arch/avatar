@@ -600,7 +600,7 @@ $('bRs').onclick=function(){['t1','t2','n1','n2','n3'].forEach(function(i){$(i).
 var mr2=null,rch=[],rst=0,rtm=0;
 function recUI(on){var p=$('rp');if(!p){p=document.createElement('div');p.id='rp';p.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:rgba(20,24,31,.92);color:#fff;border-radius:999px;padding:8px 14px;align-items:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.3);display:none';p.innerHTML='<span style="width:10px;height:10px;border-radius:50%;background:#e5484d"></span><span id="rt">0:00</span><span style="width:60px;height:6px;background:#444;border-radius:3px;overflow:hidden"><span id="rl" style="display:block;height:100%;width:0;background:#2cc4ae"></span></span><button id="rx" style="min-height:32px;padding:4px 12px;border-radius:999px;background:#e5484d;color:#fff;border:0">Dhaabi</button>';document.body.appendChild(p);$('rx').onclick=function(){$('bRec').onclick()}}p.style.display=on?'flex':'none'}
 function startRec(){
- if(!navigator.mediaDevices||!window.MediaRecorder){msg('Browser kee waraabuu hin deeggaru. Chrome haaraa fayyadami, ykn Sagalee faayila irraa fudhadhu tuqi.');return}
+ if(!navigator.mediaDevices||!window.MediaRecorder){msg('Browser kee waraabuu hin deeggaru. Waraabaa bilbilaa ni banama.');aIn.click();return}
  navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){
   rch=[];mr2=new MediaRecorder(s);
   mr2.ondataavailable=function(e){if(e.data&&e.data.size)rch.push(e.data)};
@@ -608,9 +608,10 @@ function startRec(){
   ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();var an2=ac.createAnalyser();an2.fftSize=256;ac.createMediaStreamSource(s).connect(an2);
   mr2.start();rst=performance.now();recUI(true);$('bRec').textContent='Dhaabi';
   rtm=setInterval(function(){var d=new Uint8Array(an2.fftSize);an2.getByteTimeDomainData(d);var m=0;for(var i=0;i<d.length;i++)m+=Math.abs(d[i]-128);$('rl').style.width=Math.min(100,m/d.length*8)+'%';var sc=Math.floor((performance.now()-rst)/1000);$('rt').textContent=Math.floor(sc/60)+':'+('0'+sc%60).slice(-2)},100);
- }).catch(function(e){var inf=false;try{inf=window.self!==window.top}catch(z){inf=true}msg('Maayikiroofoonii hin banamne ('+(e&&e.name||'dogoggora')+'). '+(inf?'Fuulli kun Claude keessatti banameera, kanaaf waraabaan leyer xiqqaa hin hojjatu. Link ofii kee (github.io) Chrome irratti bani. Yeroo ammaa Sagalee faayila irraa fudhadhu tuqi.':'Chrome irratti 🔒 tuqi → Permissions → Microphone → Allow godhi.'))})
+ }).catch(function(e){var inf=false;try{inf=window.self!==window.top}catch(z){inf=true}msg('Maayikiroofoonii hin banamne ('+(e&&e.name||'dogoggora')+'). '+(inf?'Fuulli kun Claude keessatti banameera, kanaaf waraabaan leyer xiqqaa hin hojjatu. Link ofii kee (github.io) Chrome irratti bani. Waraabaa bilbilaa ni banama.':'Chrome irratti 🔒 tuqi → Permissions → Microphone → Allow godhi. Waraabaa bilbilaa ni banama.'));aIn.click()})
 }
 $('bRec').onclick=function(){if(mr2){mr2.stop();return}startRec()};
+var tt2=0;function msg(t){st.textContent=t;var d=$('toast');if(!d){d=document.createElement('div');d.id='toast';d.style.cssText='position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:60;background:rgba(20,24,31,.95);color:#fff;border-radius:12px;padding:10px 14px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.3);display:none';document.body.appendChild(d)}if(!t){d.style.display='none';return}d.textContent=t;d.style.display='block';clearTimeout(tt2);tt2=setTimeout(function(){d.style.display='none'},7000)}
 var rec=null;
 $('bMic').onclick=function(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
